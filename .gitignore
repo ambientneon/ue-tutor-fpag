@@ -1,0 +1,81 @@
+# === Unreal Engine (официальный + доработки) ===
+# Visual Studio / IDE
+.vs/
+.vscode/
+.idea/
+*.sln
+*.slnx
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+.vsconfig
+*.xcodeproj
+*.xcworkspace
+
+# Compiled object files
+*.slo
+*.lo
+*.o
+*.obj
+*.gch
+*.pch
+
+# Libraries / executables (генерируются)
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+*.exe
+*.out
+*.app
+*.ipa
+*.pdb
+
+# Unreal generated
+Binaries/
+Plugins/**/Binaries/
+Build/
+!Build/*/
+Build/*/**
+!Build/*/PakBlacklist*.txt
+!Build/**/*.ico
+*_BuiltData.uasset
+Saved/
+Intermediate/
+Plugins/**/Intermediate/
+DerivedDataCache/
+SourceArt/**/*.png
+SourceArt/**/*.tga
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Python / assetout
+__pycache__/
+*.py[cod]
+.assetout/data/          # локальное зеркало assetout (не коммитим)
+*.log
+
+# Прочее
+*.bak
+*.tmp
+*.orig
+*~
+
+# BEGIN assetout-tracked
+.assetout/data/
+AdventureGame/Content/Characters/Mannequins/Meshes/SKM_Manny_Simple.uasset
+AdventureGame/Content/Characters/Mannequins/Meshes/SKM_Quinn_Simple.uasset
+AdventureGame/Content/Characters/Mannequins/Rigs/CR_Mannequin_Body.uasset
+AdventureGame/Content/Characters/Mannequins/Textures/Manny/T_Manny_02_BN.uasset
+# END assetout-tracked

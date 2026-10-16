@@ -1,0 +1,36 @@
+# Авто-определение текста + нормализация переносов строк
+* text=auto
+
+# Windows batch / shell
+*.bat eol=crlf
+*.cmd eol=crlf
+*.sh  eol=lf
+
+# Unreal текстовые файлы
+*.ini text
+*.uproject text
+*.uplugin text
+*.usf text
+*.ush text
+*.hlsl text
+*.glsl text
+
+# Небольшие бинарные ассеты (если < 10 МБ) — можно включить LFS
+# Раскомментируй, если хочешь LFS для них:
+# *.uasset filter=lfs diff=lfs merge=lfs -text
+# *.umap   filter=lfs diff=lfs merge=lfs -text
+
+# Сырые ассеты (обычно большие → через assetout)
+*.fbx  -text
+*.blend -text
+*.psd  -text
+*.tga  -text
+*.exr  -text
+*.hdr  -text
+*.wav  -text
+*.ogg  -text
+*.mp3  -text
+*.png  -text
+*.jpg  -text
+*.jpeg -text
+*.dds  -text

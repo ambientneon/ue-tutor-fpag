@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "files": {
+    "AdventureGame/Content/Characters/Mannequins/Meshes/SKM_Manny_Simple.uasset": {
+      "size": 15825101,
+      "hash": "abad3c3448667fdc72c784742f8b8830",
+      "mtime": 1792071726.2063606,
+      "added_at": "2026-10-16T09:21:16.809202+00:00"
+    },
+    "AdventureGame/Content/Characters/Mannequins/Meshes/SKM_Quinn_Simple.uasset": {
+      "size": 16252577,
+      "hash": "126234c6cceab5cb72b732170edcfae7",
+      "mtime": 1792071726.2898846,
+      "added_at": "2026-10-16T09:21:16.943617+00:00"
+    },
+    "AdventureGame/Content/Characters/Mannequins/Rigs/CR_Mannequin_Body.uasset": {
+      "size": 17057558,
+      "hash": "a83bb97f733cfde097f13b7bee39598a",
+      "mtime": 1792071726.3874326,
+      "added_at": "2026-10-16T09:21:17.103221+00:00"
+    },
+    "AdventureGame/Content/Characters/Mannequins/Textures/Manny/T_Manny_02_BN.uasset": {
+      "size": 20999487,
+      "hash": "0fef7780955510fc8a69866c3bd4b46c",
+      "mtime": 1792071726.8308942,
+      "added_at": "2026-10-16T09:21:17.705614+00:00"
+    }
+  }
+}
