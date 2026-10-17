@@ -2,6 +2,7 @@
 #include "Data/ItemDefinition.h"
 #include "Data/ItemData.h"
 
+#pragma region Public
 APickupBase::APickupBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -20,16 +21,6 @@ APickupBase::APickupBase()
 	SphereComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	SphereComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	SphereComponent->SetGenerateOverlapEvents(true);
-}
-
-void APickupBase::BeginPlay()
-{
-	Super::BeginPlay();
-
-	SphereComponent->OnComponentBeginOverlap.RemoveAll(this);
-	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &APickupBase::OnSphereBeginOverlap);
-
-	InitializePickup();
 }
 
 void APickupBase::InitializePickup()
@@ -52,11 +43,7 @@ void APickupBase::InitializePickup()
 		: ItemDataRow->ItemBase.LoadSynchronous();
 	if (!ensure(TempItemDefinition)) { return; }
 
-	ReferenceItem = NewObject<UItemDefinition>(this);
-	ReferenceItem->ID = TempItemDefinition->ID;
-	ReferenceItem->ItemType = TempItemDefinition->ItemType;
-	ReferenceItem->ItemText = TempItemDefinition->ItemText;
-	ReferenceItem->WorldMesh = TempItemDefinition->WorldMesh;
+	ReferenceItem = TempItemDefinition->CreateItemCopy(GetTransientPackage());
 
 	UStaticMesh* LoadedMesh = TempItemDefinition->WorldMesh.IsValid()
 		? TempItemDefinition->WorldMesh.Get()
@@ -67,6 +54,18 @@ void APickupBase::InitializePickup()
 	PickupMeshComponent->SetVisibility(true);
 
 	SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+#pragma endregion
+
+#pragma region Protected
+void APickupBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	SphereComponent->OnComponentBeginOverlap.RemoveAll(this);
+	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &APickupBase::OnSphereBeginOverlap);
+
+	InitializePickup();
 }
 
 void APickupBase::OnSphereBeginOverlap(
@@ -82,7 +81,9 @@ void APickupBase::OnSphereBeginOverlap(
 
 	AAdventureCharacter* Character = Cast<AAdventureCharacter>(OtherActor);
 	if (!Character) { return; }
-	
+
+	Character->GiveItem(ReferenceItem);
+
 	PickupMeshComponent->SetVisibility(false);
 	PickupMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -108,3 +109,4 @@ void APickupBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedE
 	}
 }
 #endif
+#pragma endregion

@@ -1,30 +1,17 @@
 #include "AdventureCharacter.h"
+#include "Components/InventoryComponent.h"
+#include "Data/EquippableToolDefinition.h"
+#include "Pickups/EquippableToolBase.h"
 
+#pragma region Public
 AAdventureCharacter::AAdventureCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	InitializeMeshes();
 	InitializeCamera();
-}
 
-void AAdventureCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if (!ensure(GEngine)) { return; }
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using AdventureCharacter."));
-
-	SetupMeshes();
-	SetupAnimations();
-
-	APlayerController* PlayerController = Cast<APlayerController>(Controller);
-	if (!ensure(PlayerController)) { return; }
-
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
-	if (!ensure(Subsystem)) { return; }
-
-	Subsystem->AddMappingContext(FirstPersonContext, 0);
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 }
 
 void AAdventureCharacter::Tick(float DeltaTime)
@@ -37,7 +24,7 @@ void AAdventureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAdventureCharacter::Move);
-	
+
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
@@ -65,8 +52,101 @@ void AAdventureCharacter::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookAxisValue.Y);
 }
 
+bool AAdventureCharacter::IsToolAlreadyOwned(UEquippableToolDefinition* ToolDefinition)
+{
+	for (UEquippableToolDefinition* InventoryItem : InventoryComponent->ToolInventory)
+	{
+		if (ToolDefinition->ID == InventoryItem->ID) { 
+			return true; 
+		}
+	}
 
-// private
+	return false;
+}
+
+void AAdventureCharacter::AttachTool(UEquippableToolDefinition* ToolDefinition)
+{
+	if (!IsToolAlreadyOwned(ToolDefinition))
+	{
+		AEquippableToolBase* ToolToEquip = GetWorld()->SpawnActor<AEquippableToolBase>(ToolDefinition->ToolAsset, this->GetActorTransform());
+
+		// Attach the tool to the First Person Character
+		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+
+		// Attach the tool to this character, and then the right hand of their first-person mesh
+		ToolToEquip->AttachToActor(this, AttachmentRules);
+		ToolToEquip->AttachToComponent(FirstPersonMeshComponent, AttachmentRules, FName(TEXT("HandGrip_R")));
+
+		// Set the animations on the character's meshes.
+		if (ensure(ToolToEquip->FirstPersonToolAnimClass))
+		{
+			FirstPersonMeshComponent->SetAnimInstanceClass(ToolToEquip->FirstPersonToolAnimClass);
+		}
+		if (ensure(ToolToEquip->ThirdPersonToolAnimClass))
+		{
+			GetMesh()->SetAnimInstanceClass(ToolToEquip->ThirdPersonToolAnimClass);
+		}
+
+		InventoryComponent->ToolInventory.Add(ToolDefinition);
+		ToolToEquip->OwningCharacter = this;
+		EquippedTool = ToolToEquip;
+
+		APlayerController* PlayerController = Cast<APlayerController>(Controller);
+		if (!ensure(PlayerController)) { return; }
+
+		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+		if (!ensure(Subsystem)) { return; }
+
+		if (!ensure(UseAction)) { return; }
+
+		Subsystem->AddMappingContext(ToolToEquip->ToolMappingContext, 1);
+		ToolToEquip->BindInputAction(UseAction);
+	}
+}
+
+void AAdventureCharacter::GiveItem(UItemDefinition* ItemDefinition)
+{
+	switch (ItemDefinition->ItemType)
+	{
+		case EItemType::Tool:
+		{
+			UEquippableToolDefinition* ToolDefinition = Cast<UEquippableToolDefinition>(ItemDefinition);
+			if (!ToolDefinition) { break; }
+
+			AttachTool(ToolDefinition);
+			break;
+		}
+		case EItemType::Consumable:
+		{ break; }
+
+		default:
+		{ break; }
+	}
+}
+#pragma endregion
+
+#pragma region Protected
+void AAdventureCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (!ensure(GEngine)) { return; }
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using AdventureCharacter."));
+
+	SetupMeshes();
+	SetupAnimations();
+
+	APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	if (!ensure(PlayerController)) { return; }
+
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+	if (!ensure(Subsystem)) { return; }
+
+	Subsystem->AddMappingContext(FirstPersonContext, 0);
+}
+#pragma endregion
+
+#pragma region Private
 void AAdventureCharacter::InitializeMeshes()
 {
 	FirstPersonMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonMesh"));
@@ -124,3 +204,4 @@ void AAdventureCharacter::SetupAnimations()
 	FirstPersonMeshComponent->SetAnimInstanceClass(FirstPersonDefaultAnimationClass);
 	GetMesh()->SetAnimInstanceClass(FirstPersonDefaultAnimationClass);
 }
+#pragma endregion

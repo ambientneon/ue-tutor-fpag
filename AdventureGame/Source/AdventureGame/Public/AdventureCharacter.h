@@ -12,13 +12,10 @@ class UInputAction;
 class UInputComponent;
 class UInputMappingContext;
 class UAnimInstance;
-
-// Categories
-// "AdventureCharacter"
-// "AdventureCharacter|Camera"
-// "AdventureCharacter|Input"
-// "AdventureCharacter|Mesh"
-// "AdventureCharacter|Animation"
+class UItemDefinition;
+class AEquippableToolBase;
+class UEquippableToolDefinition;
+class UInventoryComponent;
 
 UCLASS(meta = (PrioritizeCategories = "AdventureCharacter"))
 class ADVENTUREGAME_API AAdventureCharacter : public ACharacter
@@ -26,35 +23,32 @@ class ADVENTUREGAME_API AAdventureCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Camera")
+	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Camera")
+	FVector FirstPersonCameraOffset = FVector(2.8, 5.9f, 0.0f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Camera")
+	float FirstPersonFieldOfView = 70.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Camera")
+	float FirstPersonScale = 0.6f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Mesh")
+	TObjectPtr<USkeletalMeshComponent> FirstPersonMeshComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Animation")
+	TSubclassOf<UAnimInstance> FirstPersonDefaultAnimationClass;
+
+	UPROPERTY(VisibleAnywhere, Category = "AdventureCharacter|Inventory")
+	TObjectPtr<UInventoryComponent> InventoryComponent;
+
 	AAdventureCharacter();
 
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Camera")
-	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
-
-	// Offset for the first-person camera
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Camera")
-	FVector FirstPersonCameraOffset = FVector(2.8, 5.9f, 0.0f);
-
-	// First-person primitives field of view
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Camera")
-	float FirstPersonFieldOfView = 70.0f;
-
-	// First-person primitives view scale
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Camera")
-	float FirstPersonScale = 0.6f;
-
-	// First-person mesh, visible only to the owning player
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Mesh")
-	TObjectPtr<USkeletalMeshComponent> FirstPersonMeshComponent;
-
-	// first persion animation class
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Animation")
-	TSubclassOf<UAnimInstance> FirstPersonDefaultAnimationClass;
-
 
 	UFUNCTION()
 	void Move(const FInputActionValue& Value);
@@ -62,23 +56,35 @@ public:
 	UFUNCTION()
 	void Look(const FInputActionValue& Value);
 
-protected:
-	virtual void BeginPlay() override;
+	UFUNCTION()
+	bool IsToolAlreadyOwned(UEquippableToolDefinition* ToolDefinition);
 
+	UFUNCTION()
+	void AttachTool(UEquippableToolDefinition* ToolDefinition);
+
+	UFUNCTION()
+	void GiveItem(UItemDefinition* ItemDefinition);
+
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Input")
 	TObjectPtr<UInputMappingContext> FirstPersonContext;
 
-	// Move Input Actions
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Input")
 	TObjectPtr<UInputAction> MoveAction;
 
-	// Jump Input Actions
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Input")
 	TObjectPtr<UInputAction> JumpAction;
 
-	// Look Input Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Input")
 	TObjectPtr<UInputAction> LookAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Input")
+	TObjectPtr<UInputAction> UseAction;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Tools")
+	TObjectPtr<AEquippableToolBase> EquippedTool;
+
+	virtual void BeginPlay() override;
 
 private:
 	void InitializeMeshes();

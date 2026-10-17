@@ -19,8 +19,6 @@ public:
 	void InitializePickup();
 
 protected:
-	virtual void BeginPlay() override;
-
 	UPROPERTY(EditInstanceOnly, Category = "Pickup | Item Table")
 	TSoftObjectPtr<UDataTable> PickupDataTable;
 
@@ -43,6 +41,9 @@ protected:
 	float RespawnTime = 4.f;
 
 	FTimerHandle RespawnTimerHandle;
+
+
+	virtual void BeginPlay() override;
 
 	UFUNCTION()
 	void OnSphereBeginOverlap(

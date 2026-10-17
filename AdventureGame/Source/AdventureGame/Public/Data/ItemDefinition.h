@@ -22,4 +22,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Data")
 	TSoftObjectPtr<UStaticMesh> WorldMesh;
+
+	virtual UItemDefinition* CreateItemCopy(UObject* Outer) const;
 };
