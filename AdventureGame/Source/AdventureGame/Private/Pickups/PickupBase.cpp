@@ -7,6 +7,8 @@ APickupBase::APickupBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	UE_LOG(LogTemp, Warning, TEXT("PICKUP[%s] BeginPlay"), *GetName());
+
 	PickupMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PickupMesh"));
 	if (!ensure(PickupMeshComponent)) { return; }
 
@@ -25,33 +27,33 @@ APickupBase::APickupBase()
 
 void APickupBase::InitializePickup()
 {
-	if (!ensure(PickupDataTable)) { return; }
-
-	const FSoftObjectPath TablePath = PickupDataTable.ToSoftObjectPath();
-	if (!ensure(!TablePath.IsNull() && !PickupItemID.IsNone())) { return; }
+	if (!ensureMsgf(!PickupDataTable.IsNull(), TEXT("Pickup[%s]: DataTable not set"), *GetName())) { return; }
+	if (!ensureMsgf(!PickupItemID.IsNone(), TEXT("Pickup[%s]: PickupItemID is None"), *GetName())) { return; }
 
 	UDataTable* LoadedDataTable = PickupDataTable.IsValid()
 		? PickupDataTable.Get()
 		: PickupDataTable.LoadSynchronous();
-	if (!ensure(LoadedDataTable)) { return; }
+	if (!ensureMsgf(LoadedDataTable, TEXT("Pickup[%s]: failed to load DataTable"), *GetName())) { return; }
 
-	const FItemData* ItemDataRow = LoadedDataTable->FindRow<FItemData>(PickupItemID, PickupItemID.ToString());
-	if (!ensure(ItemDataRow)) { return; }
+	const FItemData* ItemDataRow = LoadedDataTable->FindRow<FItemData>(PickupItemID, TEXT("InitializePickup"));
+	if (!ensureMsgf(ItemDataRow, TEXT("Pickup[%s]: row '%s' not found"), *GetName(), *PickupItemID.ToString())) { return; }
 
 	UItemDefinition* TempItemDefinition = ItemDataRow->ItemBase.IsValid()
 		? ItemDataRow->ItemBase.Get()
 		: ItemDataRow->ItemBase.LoadSynchronous();
-	if (!ensure(TempItemDefinition)) { return; }
-
+	if (!ensureMsgf(TempItemDefinition, TEXT("Pickup[%s]: ItemBase load failed"), *GetName())) { return; }
+	
 	ReferenceItem = TempItemDefinition->CreateItemCopy(GetTransientPackage());
+	if (!ensureMsgf(ReferenceItem, TEXT("Pickup[%s]: RefenceItem create failed"), *GetName())) { return; }
 
 	UStaticMesh* LoadedMesh = TempItemDefinition->WorldMesh.IsValid()
 		? TempItemDefinition->WorldMesh.Get()
 		: TempItemDefinition->WorldMesh.LoadSynchronous();
-	if (!ensure(LoadedMesh)) { return; }
+	if (!ensureMsgf(LoadedMesh, TEXT("Pickup[%s]: WorldMesh load failed"), *GetName())) { return; }
 
 	PickupMeshComponent->SetStaticMesh(LoadedMesh);
 	PickupMeshComponent->SetVisibility(true);
+	PickupMeshComponent->SetHiddenInGame(false);
 
 	SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
@@ -80,7 +82,7 @@ void APickupBase::OnSphereBeginOverlap(
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Attempting a pickup collision"));
 
 	AAdventureCharacter* Character = Cast<AAdventureCharacter>(OtherActor);
-	if (!Character) { return; }
+	if (!Character || !ReferenceItem) { return; }
 
 	Character->GiveItem(ReferenceItem);
 

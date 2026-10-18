@@ -96,7 +96,6 @@ void AAdventureCharacter::AttachTool(UEquippableToolDefinition* ToolDefinition)
 
 		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 		if (!ensure(Subsystem)) { return; }
-
 		if (!ensure(UseAction)) { return; }
 
 		Subsystem->AddMappingContext(ToolToEquip->ToolMappingContext, 1);
@@ -123,6 +122,27 @@ void AAdventureCharacter::GiveItem(UItemDefinition* ItemDefinition)
 		{ break; }
 	}
 }
+
+FVector AAdventureCharacter::GetCameraTargetLocation()
+{
+	FVector TargetPosition;
+	const UWorld* World = GetWorld();
+	if (!World) { return TargetPosition; }
+
+	FHitResult HitResult;
+
+	// simulate a line trace from the character along the vector they are looking down
+	const FVector TraceStart = FirstPersonCameraComponent->GetComponentLocation();
+	const FVector TraceEnd = TraceStart + FirstPersonCameraComponent->GetForwardVector() * 10000.f;
+
+	// simulate a line trace and result in hit
+	World->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility);
+
+	// if the trace made a blocking hit, use the impact point as the target; otherwise, use the end point of trace
+	TargetPosition = HitResult.bBlockingHit ? HitResult.ImpactPoint : HitResult.TraceEnd;
+
+	return TargetPosition;
+}
 #pragma endregion
 
 #pragma region Protected
@@ -133,8 +153,10 @@ void AAdventureCharacter::BeginPlay()
 	if (!ensure(GEngine)) { return; }
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using AdventureCharacter."));
 
-	SetupMeshes();
 	SetupAnimations();
+	SetupMeshes();
+
+	FirstPersonCameraComponent->SetRelativeLocation(FVector(2.8f, 5.9f, 0.0f));
 
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	if (!ensure(PlayerController)) { return; }
@@ -198,7 +220,6 @@ void AAdventureCharacter::SetupAnimations()
 {
 	if (!ensure(FirstPersonDefaultAnimationClass)) { return; }
 	if (!ensure(FirstPersonMeshComponent)) { return; }
-
 	if (!ensure(GetMesh())) { return; }
 
 	FirstPersonMeshComponent->SetAnimInstanceClass(FirstPersonDefaultAnimationClass);

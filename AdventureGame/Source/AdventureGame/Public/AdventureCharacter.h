@@ -17,31 +17,31 @@ class AEquippableToolBase;
 class UEquippableToolDefinition;
 class UInventoryComponent;
 
-UCLASS(meta = (PrioritizeCategories = "AdventureCharacter"))
+UCLASS()
 class ADVENTUREGAME_API AAdventureCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Camera")
+	UPROPERTY(VisibleAnywhere, Category = "Adventure Character | Camera")
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Camera")
+	UPROPERTY(EditAnywhere, Category = "Adventure Character | Camera")
 	FVector FirstPersonCameraOffset = FVector(2.8, 5.9f, 0.0f);
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Camera")
+	UPROPERTY(EditAnywhere, Category = "Adventure Character | Camera")
 	float FirstPersonFieldOfView = 70.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Camera")
+	UPROPERTY(EditAnywhere, Category = "Adventure Character | Camera")
 	float FirstPersonScale = 0.6f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Mesh")
+	UPROPERTY(VisibleAnywhere, Category = "Adventure Character | Mesh")
 	TObjectPtr<USkeletalMeshComponent> FirstPersonMeshComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Animation")
+	UPROPERTY(EditAnywhere, Category = "Adventure Character | Animation")
 	TSubclassOf<UAnimInstance> FirstPersonDefaultAnimationClass;
 
-	UPROPERTY(VisibleAnywhere, Category = "AdventureCharacter|Inventory")
+	UPROPERTY(VisibleAnywhere, Category = "Adventure Character | Inventory")
 	TObjectPtr<UInventoryComponent> InventoryComponent;
 
 	AAdventureCharacter();
@@ -65,23 +65,26 @@ public:
 	UFUNCTION()
 	void GiveItem(UItemDefinition* ItemDefinition);
 
+	UFUNCTION()
+	FVector GetCameraTargetLocation();
+
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Adventure Character| Input")
 	TObjectPtr<UInputMappingContext> FirstPersonContext;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Adventure Character| Input")
 	TObjectPtr<UInputAction> MoveAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Adventure Character| Input")
 	TObjectPtr<UInputAction> JumpAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Adventure Character| Input")
 	TObjectPtr<UInputAction> LookAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Adventure Character| Input")
 	TObjectPtr<UInputAction> UseAction;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AdventureCharacter|Tools")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Adventure Character| Tools")
 	TObjectPtr<AEquippableToolBase> EquippedTool;
 
 	virtual void BeginPlay() override;
