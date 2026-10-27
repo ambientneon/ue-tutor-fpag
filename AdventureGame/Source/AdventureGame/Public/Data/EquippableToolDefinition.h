@@ -1,3 +1,5 @@
+// Data/EquippableToolDefinition.h
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -5,16 +7,19 @@
 #include "EquippableToolDefinition.generated.h"
 
 class AEquippableToolBase;
-class UInputMappingContext;
 
 UCLASS(BlueprintType, Blueprintable)
 class ADVENTUREGAME_API UEquippableToolDefinition : public UItemDefinition
 {
 	GENERATED_BODY()
 
+	// UItemDefinition
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<AEquippableToolBase> ToolAsset;
-
 	virtual UEquippableToolDefinition* CreateItemCopy(UObject* Outer) const override;
+
+
+	// current
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Equippable Tool Definition | Tools")
+	TSubclassOf<AEquippableToolBase> ToolAsset;
 };

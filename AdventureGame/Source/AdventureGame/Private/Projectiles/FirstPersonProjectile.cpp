@@ -1,8 +1,28 @@
+// Projectiles/FirstPersonProjectile.cpp
+
 #include "Projectiles/FirstPersonProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 
-#pragma region Public
+#pragma region Base
+
+// public
+void AFirstPersonProjectile::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+// protected
+void AFirstPersonProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+#pragma endregion
+
+#pragma region Current
+
+// public 
 AFirstPersonProjectile::AFirstPersonProjectile()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -12,11 +32,6 @@ AFirstPersonProjectile::AFirstPersonProjectile()
 	InitializeMovementComponent();
 
 	InitialLifeSpan = ProjectileLifespan;
-}
-
-void AFirstPersonProjectile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 void AFirstPersonProjectile::OnHit(
@@ -37,26 +52,22 @@ void AFirstPersonProjectile::OnHit(
 		return;
 	}
 
-	if (!OtherActor || OtherActor == this) { return; }
-	if (!OtherComp || !OtherComp->IsSimulatingPhysics()) { return; }
+	if (!OtherActor || OtherActor == this) 
+		return;
+	
+	if (!OtherComp || !OtherComp->IsSimulatingPhysics()) 
+		return;
 
 	OtherComp->AddImpulseAtLocation(GetVelocity() * PhysicsForce, GetActorLocation());
 	Destroy();
 }
-#pragma endregion
 
-#pragma region Protected
-void AFirstPersonProjectile::BeginPlay()
-{
-	Super::BeginPlay();
-}
-#pragma endregion
-
-#pragma region Private
+// private
 void AFirstPersonProjectile::InitializeCollisionsComponent()
 {
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
-	if (!ensure(CollisionComponent)) { return; }
+	if (!ensure(CollisionComponent))
+		return;
 
 	CollisionComponent->InitSphereRadius(5.f);
 	CollisionComponent->BodyInstance.SetCollisionProfileName("Projectile");
@@ -68,8 +79,11 @@ void AFirstPersonProjectile::InitializeCollisionsComponent()
 void AFirstPersonProjectile::InitializeMeshComponent()
 {
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh"));
-	if (!ensure(ProjectileMesh)) { return; }
-	if (!ensure(CollisionComponent)) { return; }
+	if (!ensure(ProjectileMesh))
+		return;
+
+	if (!ensure(CollisionComponent))
+		return;
 
 	ProjectileMesh->SetupAttachment(CollisionComponent);
 }
@@ -77,8 +91,11 @@ void AFirstPersonProjectile::InitializeMeshComponent()
 void AFirstPersonProjectile::InitializeMovementComponent()
 {
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-	if (!ensure(ProjectileMovement)) { return; }
-	if (!ensure(CollisionComponent)) { return; }
+	if (!ensure(ProjectileMovement))
+		return;
+
+	if (!ensure(CollisionComponent))
+		return;
 
 	ProjectileMovement->UpdatedComponent = CollisionComponent;
 	ProjectileMovement->InitialSpeed = 3000.f;
@@ -88,4 +105,5 @@ void AFirstPersonProjectile::InitializeMovementComponent()
 	ProjectileMovement->Bounciness = 0.2f;
 	ProjectileMovement->Friction = 0.8f;
 }
+
 #pragma endregion

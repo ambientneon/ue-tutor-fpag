@@ -1,3 +1,5 @@
+// Projectiles/FoamDart.h
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,5 +10,4 @@ UCLASS()
 class ADVENTUREGAME_API AFoamDart : public AFirstPersonProjectile
 {
 	GENERATED_BODY()
-	
 };

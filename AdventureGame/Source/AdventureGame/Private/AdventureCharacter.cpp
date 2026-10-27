@@ -1,9 +1,12 @@
+// AdventureCharacter.cpp
+
 #include "AdventureCharacter.h"
 #include "Components/InventoryComponent.h"
 #include "Data/EquippableToolDefinition.h"
 #include "Pickups/EquippableToolBase.h"
 
 #pragma region Public
+
 AAdventureCharacter::AAdventureCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -29,13 +32,16 @@ void AAdventureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAdventureCharacter::Look);
+
+	EnhancedInputComponent->BindAction(UseAction, ETriggerEvent::Triggered, this, &AAdventureCharacter::Look);
 }
 
 void AAdventureCharacter::Move(const FInputActionValue& Value)
 {
-	if (!Controller) { return; }
+	if (!Controller) 
+		return;
+	
 	const FVector2D MovementValue = Value.Get<FVector2D>();
-
 	const FVector Right = GetActorRightVector();
 	AddMovementInput(Right, MovementValue.X);
 
@@ -45,9 +51,10 @@ void AAdventureCharacter::Move(const FInputActionValue& Value)
 
 void AAdventureCharacter::Look(const FInputActionValue& Value)
 {
-	if (!Controller) { return; }
+	if (!Controller) 
+		return;
+	
 	const FVector2D LookAxisValue = Value.Get<FVector2D>();
-
 	AddControllerYawInput(LookAxisValue.X);
 	AddControllerPitchInput(LookAxisValue.Y);
 }
@@ -82,7 +89,8 @@ void AAdventureCharacter::AttachTool(UEquippableToolDefinition* ToolDefinition)
 		{
 			FirstPersonMeshComponent->SetAnimInstanceClass(ToolToEquip->FirstPersonToolAnimClass);
 		}
-		if (ensure(ToolToEquip->ThirdPersonToolAnimClass))
+		
+		if (ToolToEquip->ThirdPersonToolAnimClass)
 		{
 			GetMesh()->SetAnimInstanceClass(ToolToEquip->ThirdPersonToolAnimClass);
 		}
@@ -92,11 +100,11 @@ void AAdventureCharacter::AttachTool(UEquippableToolDefinition* ToolDefinition)
 		EquippedTool = ToolToEquip;
 
 		APlayerController* PlayerController = Cast<APlayerController>(Controller);
-		if (!ensure(PlayerController)) { return; }
+		if (!PlayerController) 
+			return;
 
 		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
-		if (!ensure(Subsystem)) { return; }
-		if (!ensure(UseAction)) { return; }
+		if (!Subsystem || !UseAction) return;
 
 		Subsystem->AddMappingContext(ToolToEquip->ToolMappingContext, 1);
 		ToolToEquip->BindInputAction(UseAction);
@@ -110,16 +118,17 @@ void AAdventureCharacter::GiveItem(UItemDefinition* ItemDefinition)
 		case EItemType::Tool:
 		{
 			UEquippableToolDefinition* ToolDefinition = Cast<UEquippableToolDefinition>(ItemDefinition);
-			if (!ToolDefinition) { break; }
+			if (!ToolDefinition) 
+				break;
 
 			AttachTool(ToolDefinition);
 			break;
 		}
 		case EItemType::Consumable:
-		{ break; }
+			break;
 
 		default:
-		{ break; }
+			break;
 	}
 }
 
@@ -127,7 +136,8 @@ FVector AAdventureCharacter::GetCameraTargetLocation()
 {
 	FVector TargetPosition;
 	const UWorld* World = GetWorld();
-	if (!World) { return TargetPosition; }
+	if (!World) 
+		return TargetPosition;
 
 	FHitResult HitResult;
 
@@ -143,14 +153,18 @@ FVector AAdventureCharacter::GetCameraTargetLocation()
 
 	return TargetPosition;
 }
+
 #pragma endregion
 
 #pragma region Protected
+
 void AAdventureCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!ensure(GEngine)) { return; }
+	if (!ensure(GEngine)) 
+		return;
+	
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using AdventureCharacter."));
 
 	SetupAnimations();
@@ -159,21 +173,25 @@ void AAdventureCharacter::BeginPlay()
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(2.8f, 5.9f, 0.0f));
 
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
-	if (!ensure(PlayerController)) { return; }
+	if (!ensure(PlayerController)) 
+		return;
 
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
-	if (!ensure(Subsystem)) { return; }
+	if (!ensure(Subsystem)) 
+		return;
 
 	Subsystem->AddMappingContext(FirstPersonContext, 0);
 }
+
 #pragma endregion
 
 #pragma region Private
+
 void AAdventureCharacter::InitializeMeshes()
 {
 	FirstPersonMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonMesh"));
-	if (!ensure(FirstPersonMeshComponent)) { return; }
-	if (!ensure(GetMesh())) { return; }
+	if (!FirstPersonMeshComponent || !GetMesh()) 
+		return;
 
 	FirstPersonMeshComponent->SetupAttachment(GetMesh());
 	FirstPersonMeshComponent->FirstPersonPrimitiveType = EFirstPersonPrimitiveType::FirstPerson;
@@ -185,7 +203,8 @@ void AAdventureCharacter::InitializeMeshes()
 void AAdventureCharacter::InitializeCamera()
 {
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
-	if (!ensure(FirstPersonCameraComponent)) { return; }
+	if (!FirstPersonCameraComponent) 
+		return;
 
 	FirstPersonCameraComponent->SetupAttachment(FirstPersonMeshComponent, FName("head"));
 
@@ -202,8 +221,11 @@ void AAdventureCharacter::InitializeCamera()
 
 void AAdventureCharacter::SetupMeshes()
 {
-	if (!ensure(FirstPersonMeshComponent)) { return; }
-	if (!ensure(GetMesh())) { return; }
+	if (!ensure(FirstPersonMeshComponent)) 
+		return;
+	
+	if (!ensure(GetMesh())) 
+		return;
 
 	// only the owning player sees the first-person mesh
 	FirstPersonMeshComponent->SetOnlyOwnerSee(true);
@@ -218,11 +240,17 @@ void AAdventureCharacter::SetupMeshes()
 
 void AAdventureCharacter::SetupAnimations()
 {
-	if (!ensure(FirstPersonDefaultAnimationClass)) { return; }
-	if (!ensure(FirstPersonMeshComponent)) { return; }
-	if (!ensure(GetMesh())) { return; }
+	if (!ensure(FirstPersonDefaultAnimationClass)) 
+		return;
+	
+	if (!ensure(FirstPersonMeshComponent)) 
+		return;
+	
+	if (!ensure(GetMesh())) 
+		return;
 
 	FirstPersonMeshComponent->SetAnimInstanceClass(FirstPersonDefaultAnimationClass);
 	GetMesh()->SetAnimInstanceClass(FirstPersonDefaultAnimationClass);
 }
+
 #pragma endregion

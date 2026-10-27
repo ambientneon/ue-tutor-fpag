@@ -1,3 +1,5 @@
+// AdventureCharacter.h
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -22,6 +24,17 @@ class ADVENTUREGAME_API AAdventureCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+	// base
+public:
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+protected:
+	virtual void BeginPlay() override;
+
+
+	// current
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Adventure Character | Camera")
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
@@ -44,11 +57,8 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Adventure Character | Inventory")
 	TObjectPtr<UInventoryComponent> InventoryComponent;
 
+
 	AAdventureCharacter();
-
-	virtual void Tick(float DeltaTime) override;
-
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
 	void Move(const FInputActionValue& Value);
@@ -86,8 +96,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Adventure Character| Tools")
 	TObjectPtr<AEquippableToolBase> EquippedTool;
-
-	virtual void BeginPlay() override;
 
 private:
 	void InitializeMeshes();

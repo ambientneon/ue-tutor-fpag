@@ -1,6 +1,10 @@
+// Data/EquippableToolDefinition.cpp
+
 #include "Data/EquippableToolDefinition.h"
 
-#pragma region Public
+#pragma region Base
+
+// public
 UEquippableToolDefinition* UEquippableToolDefinition::CreateItemCopy(UObject* Outer) const
 {
 	if (!Outer)
@@ -10,4 +14,5 @@ UEquippableToolDefinition* UEquippableToolDefinition::CreateItemCopy(UObject* Ou
 
 	return DuplicateObject<UEquippableToolDefinition>(this, Outer);
 }
+
 #pragma endregion

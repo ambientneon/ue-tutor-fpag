@@ -1,3 +1,5 @@
+// Projectiles/FirstPersonProjectile.h
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -11,21 +13,27 @@ UCLASS(BlueprintType, Blueprintable)
 class ADVENTUREGAME_API AFirstPersonProjectile : public AActor
 {
 	GENERATED_BODY()
+
+	// base 
+public:
+	virtual void Tick(float DeltaTime) override;
+
+protected:
+	virtual void BeginPlay() override;
+
 	
+	// current
 public:	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile | Mesh")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "First Person Projectile | Mesh")
 	TObjectPtr<UStaticMeshComponent> ProjectileMesh;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile | Physics")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "First Person Projectile | Physics")
 	float PhysicsForce = 100.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile | Lifespan")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "First Person Projectile | Lifespan")
 	float ProjectileLifespan = 5.f;
 
-	
 	AFirstPersonProjectile();
-	
-	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	void OnHit(
@@ -37,14 +45,11 @@ public:
 	);
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile | Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "First Person Projectile | Components")
 	TObjectPtr<USphereComponent> CollisionComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile | Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "First Person Projectile | Components")
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
-
-
-	virtual void BeginPlay() override;
 
 private:
 	void InitializeCollisionsComponent();

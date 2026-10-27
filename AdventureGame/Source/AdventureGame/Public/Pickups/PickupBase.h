@@ -1,3 +1,5 @@
+// Pickups/PickupBase.h
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -12,38 +14,46 @@ UCLASS(BlueprintType, Blueprintable, meta = (PrioritizeCategories = "Pickup"))
 class ADVENTUREGAME_API APickupBase : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+	// base 
+protected:
+	virtual void BeginPlay() override;
+
+#if WITH_EDITOR
+	// runs whenever a property on this object is changed in the editor
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
+
+	// current
+public:
 	APickupBase();
 
 	void InitializePickup();
 
 protected:
-	UPROPERTY(EditInstanceOnly, Category = "Pickup | Item Table")
+	UPROPERTY(EditInstanceOnly, Category = "Pickup Base | Item Table")
 	TSoftObjectPtr<UDataTable> PickupDataTable;
 
-	UPROPERTY(EditInstanceOnly, Category = "Pickup | Item Table")
+	UPROPERTY(EditInstanceOnly, Category = "Pickup Base | Item Table")
 	FName PickupItemID;
 
-	UPROPERTY(VisibleAnywhere, Category = "Pickup | Reference Item")
+	UPROPERTY(VisibleAnywhere, Category = "Pickup Base | Reference Item")
 	TObjectPtr<UItemDefinition> ReferenceItem;
 
-	UPROPERTY(VisibleAnywhere, Category = "Pickup | Mesh")
+	UPROPERTY(VisibleAnywhere, Category = "Pickup Base | Mesh")
 	TObjectPtr<UStaticMeshComponent> PickupMeshComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pickup | Components")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pickup Base | Components")
 	TObjectPtr<USphereComponent> SphereComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pickup | Respawn")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pickup Base | Respawn")
 	bool bShouldRespawn;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pickup | Respawn")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pickup Base | Respawn")
 	float RespawnTime = 4.f;
 
 	FTimerHandle RespawnTimerHandle;
-
-
-	virtual void BeginPlay() override;
 
 	UFUNCTION()
 	void OnSphereBeginOverlap(
@@ -54,9 +64,4 @@ protected:
 		bool bFromSweep,
 		const FHitResult& SweepResult
 	);
-
-#if WITH_EDITOR
-	// runs whenever a property on this object is changed in the editor
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
 };

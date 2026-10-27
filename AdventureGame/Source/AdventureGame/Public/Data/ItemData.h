@@ -1,3 +1,4 @@
+// Data/ItemType.h
 
 #pragma once
 
@@ -10,8 +11,8 @@ class UItemDefinition;
 UENUM(BlueprintType)
 enum class EItemType : uint8
 {
-	Tool        UMETA(DisplayName = "Tool"),
-	Consumable  UMETA(DisplayName = "Consumable")
+	Tool        = 0 UMETA(DisplayName = "Tool"),
+	Consumable  = 1 UMETA(DisplayName = "Consumable")
 };
 
 USTRUCT(BlueprintType)
@@ -19,10 +20,10 @@ struct FItemText
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Text")
 	FText Name;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Text")
 	FText Description;
 };
 

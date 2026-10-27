@@ -1,3 +1,5 @@
+// Components/InventoryComponent.h
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -11,12 +13,15 @@ class ADVENTUREGAME_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tools")
+	// base
+protected:
+	virtual void BeginPlay() override;
+
+
+	// current
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory Component | Tools")
 	TArray<TObjectPtr<UEquippableToolDefinition>> ToolInventory;
 
 	UInventoryComponent();
-
-protected:
-	virtual void BeginPlay() override;
 };

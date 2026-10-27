@@ -1,17 +1,21 @@
+// Pickups/DartLauncher.cpp
+
 #include "Pickups/DartLauncher.h"
 #include "AdventureCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "EnhancedInputComponent.h"
 #include "Projectiles/FirstPersonProjectile.h"
 
-#pragma region Public
+#pragma region Base
+
+// public
 void ADartLauncher::Use()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, TEXT("Using the dart launcher!"));
 
 	UWorld* const World = GetWorld();
-	if (!World) { return; }
-	if (!ProjectileClass) { return; }
+	if (!World || !ProjectileClass) 
+		return;
 
 	FVector TargetPosition = OwningCharacter->GetCameraTargetLocation();
 
@@ -31,11 +35,14 @@ void ADartLauncher::Use()
 void ADartLauncher::BindInputAction(const UInputAction* InputToBind)
 {
 	APlayerController* PlayerController = Cast<APlayerController>(OwningCharacter->GetController());
-	if (!PlayerController) { return; }
+	if (!PlayerController) 
+		return;
 
 	UEnhancedInputComponent* EnhancedImputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent);
-	if (!EnhancedImputComponent) { return; }
+	if (!EnhancedImputComponent) 
+		return;
 
 	EnhancedImputComponent->BindAction(InputToBind, ETriggerEvent::Triggered, this, &ADartLauncher::Use);
 }
+
 #pragma endregion

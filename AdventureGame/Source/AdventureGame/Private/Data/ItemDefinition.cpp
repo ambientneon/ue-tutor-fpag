@@ -1,6 +1,10 @@
+// Data/ItemDefinition.cpp
+
 #include "Data/ItemDefinition.h"
 
-#pragma region Public
+#pragma region Current
+
+// public
 UItemDefinition* UItemDefinition::CreateItemCopy(UObject* Outer) const
 {
 	UItemDefinition* ItemCopy = NewObject<UItemDefinition>(Outer);
@@ -11,4 +15,5 @@ UItemDefinition* UItemDefinition::CreateItemCopy(UObject* Outer) const
 
 	return ItemCopy;
 }
+
 #pragma endregion
