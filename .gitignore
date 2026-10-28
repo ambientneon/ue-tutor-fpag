@@ -74,6 +74,7 @@ __pycache__/
 
 # ue build folder
 ue-build/
+AdventureGame**.zip
 
 # BEGIN assetout-tracked
 .assetout/data/
